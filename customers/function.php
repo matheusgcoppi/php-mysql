@@ -11,6 +11,54 @@
         exit();
     };
 
+    function findUserById($input) {
+        global $connection;
+
+        $id = mysqli_real_escape_string($connection, $input['id']);
+
+        if(empty(trim($id))) {
+            return error422('Enter the ID');
+        } else {
+            $query = "SELECT * FROM customers WHERE id = '$id'";
+            $queryResponse = mysqli_query($connection, $query);
+
+            if($queryResponse) {
+                
+                if(mysqli_num_rows($queryResponse) == 0) {
+                    $data = [
+                        'status' => 404,
+                        'message' =>'Customer Not Found', 
+                    ];
+                    header("HTTP/1.0 201 Not Found");
+                    return json_encode($data);
+                }
+
+                else {
+                $response = mysqli_fetch_all($queryResponse, MYSQLI_ASSOC);
+
+                $data = [
+                    'status' => 201,
+                    'message' =>'Customer By Id: ' . $id .' Listed Successfully', 
+                    'Response' => $response
+                ];
+                header("HTTP/1.0 201 Listed");
+                return json_encode($data);
+                }
+            }
+            else {
+                $data = [
+                    'status' => 404,
+                    'message' =>'Customer Not Found', 
+                ];
+                header("HTTP/1.0 201 Not Found");
+                return json_encode($data);
+            }
+        }
+
+
+
+    }
+
     function storeCustomer($customerInput) {
 
         global $connection;
