@@ -10,16 +10,13 @@
 
     if($requestMethod == 'GET') {
 
-        $CustomerList = getCustomerList();
-        if ($CustomerList === null) {
-            // Handle error case
-            $data = [
-                'status' => 404,
-                'message' => 'No Customer Found', 
-            ];
-            header("HTTP/1.0 404 No Customer Found");
-            echo json_encode($data);
+        
+        if (isset($_GET['id'])) { //isset check if the URL has id
+            echo $_GET['id'];
+            $customer = getCustomer($_GET);
+            echo $customer;
         } else {
+            $CustomerList = getCustomerList();
             echo $CustomerList;
         }
 
