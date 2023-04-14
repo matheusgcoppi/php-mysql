@@ -106,6 +106,107 @@
 
     }
 
+    function updateCustomer($customerInput, $customerParams) {
+
+        global $connection;
+
+        if (!isset($customerParams['id'])) {
+
+            return error422('Customer Id Not Found in URL');
+
+        } elseif($customerParams['id'] == null) {
+
+           return error422('Enter The Customer ID');
+        }
+        
+
+        $customerId = mysqli_real_escape_string($connection, $customerParams['id']);
+
+        $name = mysqli_real_escape_string($connection, $customerInput['name']);
+        $email = mysqli_real_escape_string($connection, $customerInput['email']);
+        $phone = mysqli_real_escape_string($connection, $customerInput['phone']);
+
+        //trim will remove whitespaces to ensure that is real empty
+
+        if(empty(trim($name))) {
+            return error422('Enter Your Name');
+
+        } elseif (empty(trim($email))) {
+            return error422('Enter Your Email');
+            
+        } elseif (empty(trim($phone))) {
+            return error422('Enter Your Phone');
+
+        } else {
+            $query = "UPDATE customers SET name='$name', email='$email', phone='$phone' WHERE id='$customerId' LIMIT 1";         
+            $queryResponse = mysqli_query($connection, $query);
+            
+
+            if($queryResponse) {
+
+                $data = [
+                    'status' => 200,
+                    'message' =>'Customer Updated Successfully', 
+                    'data' => [
+                        'name' => $name,
+                        'email' => $email,
+                        'phone' => $phone
+                    ]
+                ];
+                header("HTTP/1.0 200 Updated");
+                return json_encode($data);
+
+            } else {
+                $data = [
+                    'status' => 500,
+                    'message' =>'Internal Server Error', 
+                ];
+                header("HTTP/1.0 500 Internal Server Error");
+                return json_encode($data);
+            }
+
+
+        };
+
+    }
+
+    function deleteCustomer($customerParams) {
+        global $connection;
+
+        if (!isset($customerParams['id'])) {
+
+            return error422('Customer Id Not Found in URL');
+
+        } elseif($customerParams['id'] == null) {
+
+           return error422('Enter The Customer ID');
+        }
+        
+
+        $customerId = mysqli_real_escape_string($connection, $customerParams['id']);
+
+        $query = "DELETE FROM customers WHERE id='$customerId' LIMIT 1 ";
+        $queryResult = mysqli_query($connection, $query);
+
+        if($queryResult) {
+            $data = [
+                'status' => 200,
+                'message' =>'Deleted Successfully', 
+            ];
+            header("HTTP/1.0 200 Deleted");
+            return json_encode($data);
+
+        } else {
+            
+            $data = [
+                'status' => 404,
+                'message' =>'Customer Not Found', 
+            ];
+            header("HTTP/1.0 404 Customer Not Found");
+            return json_encode($data);
+        }
+    }
+
     function getCustomer($customerParams) {
         
         global $connection;
